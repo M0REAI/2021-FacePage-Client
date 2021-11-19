@@ -1,17 +1,17 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <upload-image></upload-image>
-  </div>
+  <main>
+    <nav-bar/>
+    <router-view/>
+  </main>
 </template>
 
 <script>
-import UploadImage from './components/UploadImage.vue'
+import NavBar from './components/common/Nav.vue'
 
 export default {
   name: 'App',
   components: {
-    UploadImage
+    NavBar,
   }
 }
 </script>
