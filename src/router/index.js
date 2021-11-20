@@ -13,6 +13,7 @@ const router = new VueRouter({
         {
             path: '/upload',
             component: UploadImage,
+            name: 'select'
         },
         {
             path: '/changed',

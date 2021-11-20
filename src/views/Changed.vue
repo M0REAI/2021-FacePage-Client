@@ -12,7 +12,7 @@
 
 <script>
 import axios from "axios";
-import { mapGetters } from "vuex";
+import { mapGetters,mapMutations } from "vuex";
 
 export default {
   name: "Changed",
@@ -27,21 +27,44 @@ export default {
       "getOriginalImageUrl",
       "getSelectedStyle",
       "getStyledImageUrl",
-      "getStyledImageKey"
+      "getStyledImageKey" 
     ]),
+    ...mapMutations([
+      "resetStyledImage"
+    ])
   },
   created() {
+    this.$store.commit('resetStyledImage')
     const selectedStyle = this.getSelectedStyle;
     const originalImageName = this.getOriginalImageName;
-    if (!selectedStyle && !originalImageName) return alert("오류 발생");
-    this.transition(originalImageName);
+    if (!selectedStyle && !originalImageName) return this.$router.push({ name: "select" });
+    this.transition(originalImageName,selectedStyle);
   },
   methods: {
     // 이미지 합성
-    async transition(filename) {
-      const response = await axios.post(
-        `http://localhost:8080/api/transition?filename=${filename}`
-      );
+    async transition(filename,style) {
+      let requestUrl;
+      switch(style){
+        case '반 고흐':
+          requestUrl =  `http://localhost:8080/api/transition?filename=${filename}` 
+          break;
+        case '파프리카':
+          requestUrl = `http://localhost:8080/api/transition/paprika?filename=${filename}`  
+          break;
+        case '이웃집 토토로':
+          requestUrl = `http://localhost:8080/api/transition/hayao?filename=${filename}`  
+          break;
+        case '너의 이름은':
+          // 신카이 마코토
+          requestUrl = `http://localhost:8080/api/transition/shinkai?filename=${filename}`
+          break;
+        case '시간을 달리는 소녀':  
+          requestUrl = `http://localhost:8080/api/transition/hosoda?filename=${filename}`
+          break;
+        default:
+          return alert('선택된 스타일이 없습니다.')
+      }
+      const response = await axios.post(requestUrl);
       const { url,key } = response.data;
       if(!url || !key) return alert('오류 발생');
       this.$store.commit('setStyledImageUrl',url);

@@ -28,6 +28,10 @@ export const store = new Vuex.Store({
     },
     setStyledImageKey(state,key) {
       return state.styledImageKey = key;
+    },
+    resetStyledImage(state) {
+      state.styledImageKey = ''
+      state.styledImageUrl = ''
     }
   },
   getters : {

@@ -20,7 +20,9 @@
     <div class="rec_images">
       <div v-for="(url, index) in urls" :key="index">
         <img :src="url" />
-        <a :href="origin+'/api/image/download/scrapped?url='+url">다운받기</a>
+        <a :href="origin + '/api/image/download/scrapped?url=' + url"
+          >다운받기</a
+        >
       </div>
     </div>
 
@@ -29,10 +31,14 @@
     <hr />
     <label for="style">캐릭터 선택</label>
     <div class="rec_images" id="style">
-      <div :class="{ selected: style == selectedStyle }" v-for="style in styles" :key="style">
-        <img :src="style"/>
-        <p>{{ style }}</p>
-        <button @click="select(style)">선택</button>
+      <div
+        :class="{ selected: style.name == selectedStyle }"
+        v-for="style in styles"
+        :key="style.name"
+      >
+        <img :src="style.image" />
+        <p>{{ style.name }}</p>
+        <button @click="select(style.name)">선택</button>
       </div>
     </div>
     <button @click="enter">enter 버튼</button>
@@ -49,9 +55,31 @@ export default {
       originalImgUrl: "",
       originalImgName: "",
       keyword: "",
-      styles:  ["반 고흐", "디즈니", "프랑켄슈타인"],
+      // https://rnwns2.tistory.com/87
+      styles: [
+        {
+          name: "반 고흐",
+          image: require("../../assets/van_gogh.jpg")
+        },
+        {
+          name: "파프리카",
+          image: require("../../assets/paprika.png")
+        },
+        {
+          name: "이웃집 토토로",
+          image: require("../../assets/totoro.png")
+        },
+        {
+          name: "너의 이름은",
+          image: require("../../assets/yourname.png")
+        },
+        {
+          name: "시간을 달리는 소녀",
+          image: require("../../assets/timerunninggirl.png")
+        },
+      ],
       selectedStyle: null,
-      origin: 'http://localhost:8080'
+      origin: "http://localhost:8080",
     };
   },
   methods: {
@@ -83,7 +111,7 @@ export default {
       console.log(style);
       this.selectedStyle = style;
       // 합성할 스타일
-      this.$store.commit('setStyle',style);
+      this.$store.commit("setStyle", style);
     },
     async searchImages() {
       try {
@@ -96,11 +124,11 @@ export default {
         console.log(error);
       }
     },
-    enter(){
-      if(!this.originalImgUrl) return alert('이미지를 업로드해 주세요.');
-      if(!this.selectedStyle) return alert('스타일을 선택해 주세요.');
-      this.$router.push({ name: 'result'});
-    }
+    enter() {
+      if (!this.originalImgUrl) return alert("이미지를 업로드해 주세요.");
+      if (!this.selectedStyle) return alert("스타일을 선택해 주세요.");
+      this.$router.push({ name: "result" });
+    },
   },
 };
 </script>
