@@ -8,7 +8,6 @@
       </router-link>
       <div class="img-list">
           <img>
-
       </div>
   </div>
 </template>

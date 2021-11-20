@@ -20,6 +20,7 @@
     <div class="rec_images">
       <div v-for="(url, index) in urls" :key="index">
         <img :src="url" />
+        <a :href="origin+'/api/image/download/scrapped?url='+url">다운받기</a>
       </div>
     </div>
 
@@ -50,6 +51,7 @@ export default {
       keyword: "",
       styles:  ["반 고흐", "디즈니", "프랑켄슈타인"],
       selectedStyle: null,
+      origin: 'http://localhost:8080'
     };
   },
   methods: {

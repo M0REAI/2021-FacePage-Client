@@ -9,28 +9,42 @@ export const store = new Vuex.Store({
   state: {
     originalImageUrl: '',
     originalImageName: '',
-    selectedStyle:''
+    selectedStyle:'',
+    styledImageKey: '',
+    styledImageUrl: ''
   },
   mutations: {
     setOriginalImageUrl(state,url){
-      return state.originalImageUrl = url 
+      return state.originalImageUrl = url;
     },
     setOriginalImageName(state,filename){
-      return state.originalImageName = filename      
+      return state.originalImageName = filename;   
     },
     setStyle(state,style){
-      return state.selectedStyle = style
+      return state.selectedStyle = style;
+    },
+    setStyledImageUrl(state,url){
+      return state.styledImageUrl = url;
+    },
+    setStyledImageKey(state,key) {
+      return state.styledImageKey = key;
     }
   },
   getters : {
     getOriginalImageName(state) {
-      return state.originalImageName
+      return state.originalImageName;
     },
     getOriginalImageUrl(state) {
-      return state.originalImageUrl
+      return state.originalImageUrl;
     },
     getSelectedStyle(state) {
-      return state.selectedStyle
+      return state.selectedStyle;
+    },
+    getStyledImageUrl(state){
+      return state.styledImageUrl;
+    },
+    getStyledImageKey(state) {
+      return state.styledImageKey;
     }
   }
 });

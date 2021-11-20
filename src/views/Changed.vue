@@ -2,11 +2,10 @@
   <div>
     <div class="images">
       이미지 자리
-      <img :src="getOriginalImageUrl" />
-      <img :src="resultImageUrl" />
+      <img :src="getOriginalImageUrl"/>
+      <img :src="getStyledImageUrl"/>
     </div>
-
-    <button>저장하기</button>
+    <a :href="'http://localhost:8080' + '/api/image/download?bucket_key='+ getStyledImageKey">이미지 다운로드</a>
     <button>공개하기</button>
   </div>
 </template>
@@ -27,6 +26,8 @@ export default {
       "getOriginalImageName",
       "getOriginalImageUrl",
       "getSelectedStyle",
+      "getStyledImageUrl",
+      "getStyledImageKey"
     ]),
   },
   created() {
@@ -41,9 +42,12 @@ export default {
       const response = await axios.post(
         `http://localhost:8080/api/transition?filename=${filename}`
       );
-      this.resultImageUrl = response.data.url;
-    },
-  },
+      const { url,key } = response.data;
+      if(!url || !key) return alert('오류 발생');
+      this.$store.commit('setStyledImageUrl',url);
+      this.$store.commit('setStyledImageKey',key);
+    }
+  }
 };
 </script>
 
