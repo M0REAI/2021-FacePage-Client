@@ -1,10 +1,10 @@
 <template>
   <div>
     <div class="images">
-      이미지 자리 
-      <img :src="originalImg">
+      이미지 자리
+      <img :src="originalImgUrl" />
+      <p>{{ originalImgName }}</p>
     </div>
-
     <label for="original">원본 이미지</label>
     <input
       type="file"
@@ -12,101 +12,114 @@
       ref="originalImg"
       accept="image/png, image/jpeg, image/jpg"
     />
-
     <label for="search">원본 이미지 검색</label>
-    <input type="text" v-model="keyword" id="search">
+    <input type="text" v-model="keyword" id="search" />
+
     <button type="button" @click="searchImages">검색하기</button>
+
     <div class="rec_images">
-        <div v-for="(url,index) in urls" :key="index">
-            <img :src="url">
-        </div>
+      <div v-for="(url, index) in urls" :key="index">
+        <img :src="url" />
+      </div>
     </div>
 
-    <hr/>
+    <hr />
     <button @click="uploadImages">업로드하기</button>
-    <hr/>
-
+    <hr />
     <label for="style">캐릭터 선택</label>
     <div class="rec_images" id="style">
-        <div v-for="(style,index) in styles" :key="index">
-            <img :src="style">
-        </div>
+      <div :class="{ selected: style == selectedStyle }" v-for="style in styles" :key="style">
+        <img :src="style"/>
+        <p>{{ style }}</p>
+        <button @click="select(style)">선택</button>
+      </div>
     </div>
-
-    <router-link to='/changed'>
-      <button>
-        enter 버튼
-      </button>
-    </router-link>
+    <button @click="enter">enter 버튼</button>
   </div>
 </template>
 
 <script>
 import axios from "axios";
 
-const styles = [1,2,3];
-
 export default {
   data() {
-      return {
-          urls:[],
-          originalImg: '',
-          keyword:'',
-          styles: styles,
-      }
+    return {
+      urls: [],
+      originalImgUrl: "",
+      originalImgName: "",
+      keyword: "",
+      styles:  ["반 고흐", "디즈니", "프랑켄슈타인"],
+      selectedStyle: null,
+    };
   },
   methods: {
     async uploadImages() {
-       
-      if (
-        this.$refs.originalImg.files.length > 0
-      ) {
-        const originalData = new FormData();
-        const originalImg = this.$refs.originalImg.files[0];
-        originalData.append("original_img", originalImg);
-        const promises = [
-            axios.post("http://localhost:4000/api/image/original",originalData)
-        ]
-        // 비동기 병렬처리
-        const responses = await Promise.all(promises);
-        responses.forEach((response)=>{
-            if(response.data.sort){
-              this.originalImg = response.data.url    
-            } else {
-                alert('error');
-            }
-        })
-      } else {
-        return;
+      try {
+        if (this.$refs.originalImg.files.length > 0) {
+          const originalData = new FormData();
+          const originalImg = this.$refs.originalImg.files[0];
+          originalData.append("original_image", originalImg);
+          const response = await axios.post(
+            "http://localhost:8080/api/image/upload",
+            originalData
+          );
+          // 비동기 병렬처리
+          const originalImageUrl = response.data.url;
+          const originalImageName = response.data.filename;
+          this.originalImgUrl = originalImageUrl;
+          this.originalImgName = originalImageName;
+          this.$store.commit("setOriginalImageUrl", originalImageUrl);
+          this.$store.commit("setOriginalImageName", originalImageName);
+        } else {
+          return alert("파일을 업로드해 주세요");
+        }
+      } catch (error) {
+        console.log(error);
       }
     },
-    async searchImages(){
-        try{
-            const keyword = this.keyword;
-            const response = await axios.get(`http://localhost:5000/api/images?keyword=${keyword}`);
-            this.urls = response.data.urls;            
-        } catch(error){
-            console.log(error); 
-        }
+    select(style) {
+      console.log(style);
+      this.selectedStyle = style;
+      // 합성할 스타일
+      this.$store.commit('setStyle',style);
+    },
+    async searchImages() {
+      try {
+        const keyword = this.keyword;
+        const response = await axios.get(
+          `http://localhost:8080/api/image/?keyword=${keyword}`
+        );
+        this.urls = response.data.urls;
+      } catch (error) {
+        console.log(error);
       }
+    },
+    enter(){
+      if(!this.originalImgUrl) return alert('이미지를 업로드해 주세요.');
+      if(!this.selectedStyle) return alert('스타일을 선택해 주세요.');
+      this.$router.push({ name: 'result'});
+    }
   },
 };
 </script>
 
 <style>
-.images{
-    display: flex;
+.images {
+  display: flex;
 }
-.images img{
-    width: 300px;
-    border:1px solid red;
+.images img {
+  width: 300px;
+  border: 1px solid red;
 }
-.rec_images{
-    border:1px solid red;
-    display: flex;
-    flex-wrap: wrap;
+.rec_images {
+  border: 1px solid red;
+  display: flex;
+  flex-wrap: wrap;
 }
-.rec_images div{
-    border: 1px solid blue;
+/* .rec_images div {
+  border: 1px solid blue;
+} */
+.selected {
+  border: 3px solid red;
 }
 </style>

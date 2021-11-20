@@ -17,6 +17,7 @@ const router = new VueRouter({
         {
             path: '/changed',
             component: Changed,
+            name: 'result'
         }
     ]
 })
