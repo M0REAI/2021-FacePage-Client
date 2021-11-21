@@ -9,7 +9,7 @@
 
 ## Image Upload Page
 ![image](https://user-images.githubusercontent.com/49024048/142772955-aaa89bb1-b8a0-482f-a588-817b3b7ecdfd.png)
-![image](https://user-images.githubusercontent.com/49024048/142772971-305a1684-9078-450f-9024-69a475f6e7c9.png)
+![image](https://user-images.githubusercontent.com/49024048/142773031-677cc94c-21a4-43e1-97e8-6903571cc6b5.png)
 
 
 
