@@ -1,155 +1,98 @@
 <template>
-  <div>
-    <div class="images">
-      이미지 자리
-      <img :src="originalImgUrl" />
-      <p>{{ originalImgName }}</p>
-    </div>
-    <label for="original">원본 이미지</label>
-    <input
-      type="file"
-      id="original"
-      ref="originalImg"
-      accept="image/png, image/jpeg, image/jpg"
-    />
-    <label for="search">원본 이미지 검색</label>
-    <input type="text" v-model="keyword" id="search" />
-
-    <button type="button" @click="searchImages">검색하기</button>
-
-    <div class="rec_images">
-      <div v-for="(url, index) in urls" :key="index">
-        <img :src="url" />
-        <a :href="origin + '/api/image/download/scrapped?url=' + url"
-          >다운받기</a
-        >
-      </div>
-    </div>
-
-    <hr />
-    <button @click="uploadImages">업로드하기</button>
-    <hr />
-    <label for="style">캐릭터 선택</label>
-    <div class="rec_images" id="style">
-      <div
-        :class="{ selected: style.name == selectedStyle }"
-        v-for="style in styles"
-        :key="style.name"
-      >
-        <img :src="style.image" />
-        <p>{{ style.name }}</p>
-        <button @click="select(style.name)">선택</button>
-      </div>
-    </div>
-    <button @click="enter">enter 버튼</button>
+  <div class="uploadPage">
+    <image-stage v-if="stage == 'stage1'"></image-stage>
+    <style-stage v-if="stage == 'stage2'"></style-stage>
   </div>
 </template>
 
 <script>
-import axios from "axios";
+import { mapState } from 'vuex';
+import ImageStage from '../components/ImageStage.vue'
+import StyleStage from '../components/StyleStage.vue';
 
 export default {
   data() {
     return {
-      urls: [],
-      originalImgUrl: "",
-      originalImgName: "",
-      keyword: "",
-      // https://rnwns2.tistory.com/87
-      styles: [
-        {
-          name: "반 고흐",
-          image: require("../../assets/van_gogh.jpg")
-        },
-        {
-          name: "파프리카",
-          image: require("../../assets/paprika.png")
-        },
-        {
-          name: "이웃집 토토로",
-          image: require("../../assets/totoro.png")
-        },
-        {
-          name: "너의 이름은",
-          image: require("../../assets/yourname.png")
-        },
-        {
-          name: "시간을 달리는 소녀",
-          image: require("../../assets/timerunninggirl.png")
-        },
-      ],
-      selectedStyle: null,
-      origin: "http://localhost:8080",
     };
   },
-  methods: {
-    async uploadImages() {
-      try {
-        if (this.$refs.originalImg.files.length > 0) {
-          const originalData = new FormData();
-          const originalImg = this.$refs.originalImg.files[0];
-          originalData.append("original_image", originalImg);
-          const response = await axios.post(
-            "http://localhost:8080/api/image/upload",
-            originalData
-          );
-          // 비동기 병렬처리
-          const originalImageUrl = response.data.url;
-          const originalImageName = response.data.filename;
-          this.originalImgUrl = originalImageUrl;
-          this.originalImgName = originalImageName;
-          this.$store.commit("setOriginalImageUrl", originalImageUrl);
-          this.$store.commit("setOriginalImageName", originalImageName);
-        } else {
-          return alert("파일을 업로드해 주세요");
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    },
-    select(style) {
-      console.log(style);
-      this.selectedStyle = style;
-      // 합성할 스타일
-      this.$store.commit("setStyle", style);
-    },
-    async searchImages() {
-      try {
-        const keyword = this.keyword;
-        const response = await axios.get(
-          `http://localhost:8080/api/image/?keyword=${keyword}`
-        );
-        this.urls = response.data.urls;
-      } catch (error) {
-        console.log(error);
-      }
-    },
-    enter() {
-      if (!this.originalImgUrl) return alert("이미지를 업로드해 주세요.");
-      if (!this.selectedStyle) return alert("스타일을 선택해 주세요.");
-      this.$router.push({ name: "result" });
-    },
+  computed: {
+    ...mapState([
+      'stage'
+    ])
   },
+  components: {
+    ImageStage,
+    StyleStage
+  }
 };
 </script>
 
 <style>
-.images {
+/* ImageStage와 StyleStage 공통 영역 */
+.uploadPage {
+  height: 100%;
   display: flex;
+  justify-content: center;
 }
-.images img {
-  width: 300px;
-  border: 1px solid red;
-}
-.rec_images {
-  border: 1px solid red;
+.uploadPage-wrapper {
+  /* 본인 크기와 위치 조정 */
+  margin: 20px 0;
+  width: 80%;
+  /* 자식 요소 배치 */
   display: flex;
-  flex-wrap: wrap;
+  justify-content: space-around;
 }
+
+.upload-content {
+  /* 본인 넓이와 위치 조정 */
+  flex: 1;
+  margin: 0 10px;
+  /* 자식 요소 배치 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stepTransition {
+  width: 90%;
+  display: flex;
+  justify-content: space-between;
+  font-size: 2rem;
+  color: rgb(49, 49, 49);
+}
+.stepTransition .step-btn {
+  display: none;
+}
+
+/* 아래는 StyleStage 영역 */
+.style-images {
+  border: 1px solid blue;
+  display: flex;
+  flex-wrap: nowrap; /* 요소들을 강제로 한 줄에 배치 */
+  width: 80%;
+  overflow: auto;
+  overflow-y: hidden;
+}
+.style-item {
+  height: 180px; 
+  margin-right: 3px;
+  box-sizing: border-box;
+}
+.rec-item p {
+  border: 1px solid red; 
+  font-size: 0.7rem; 
+  text-align: center;
+} 
 /* .rec_images div {
   border: 1px solid blue;
 } */
-.selected {
+.selected img {
+   box-sizing: border-box;
   border: 3px solid red;
+}
+
+
+.upload-btn {
+  width: 150px;
 }
 </style>

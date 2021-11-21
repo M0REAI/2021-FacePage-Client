@@ -7,6 +7,7 @@ Vue.use(Vuex);
 export const store = new Vuex.Store({
   // counter라는 state 속성을 추가
   state: {
+    stage: 'stage1',
     originalImageUrl: '',
     originalImageName: '',
     selectedStyle:'',
@@ -14,6 +15,9 @@ export const store = new Vuex.Store({
     styledImageUrl: ''
   },
   mutations: {
+    setStage(state,stage){
+      return state.stage = stage;
+    },
     setOriginalImageUrl(state,url){
       return state.originalImageUrl = url;
     },
